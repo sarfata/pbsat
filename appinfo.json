@@ -3,17 +3,32 @@
   "shortName": "Pebble ISS Tracker",
   "longName": "Pebble ISS Tracker",
   "companyName": "Pebble Technology",
+  "capabilities": [ "location" ],
   "versionCode": 1,
   "versionLabel": "1.0.0",
   "watchapp": {
     "watchface": true
   },
   "appKeys": {
-    "duration": 1,
-    "risetime": 0,
-    "timezoneOffset": 12
+    "risetime": 420,
+    "duration": 421,
+    "timezoneOffset": 422,
+    "error": 423,
+    "requestUpdate": 424
   },
   "resources": {
-    "media": []
+    "media": [
+      {
+        "menuIcon": true,
+        "type":"png",
+        "name":"IMAGE_MENU_ICON",
+        "file":"menu_icon_iss.png"
+       },
+       {
+        "type":"png",
+        "name":"BACKGROUND_IMAGE",
+        "file":"backgroundiss.png"
+       }
+    ]
   }
 }
