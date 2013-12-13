@@ -2,7 +2,7 @@ function sendTimezoneToWatch() {
   // Get the number of seconds to add to convert localtime to utc
   var offsetMinutes = new Date().getTimezoneOffset() * 60;
   // Send it to the watch
-  Pebble.sendAppMessage({ timezoneOffset: offsetMinutes.toString() })
+  Pebble.sendAppMessage({ timezoneOffset: offsetMinutes })
 }
 
 function doUpdate() {
@@ -18,13 +18,13 @@ function doUpdate() {
   }
 }
 
-PebbleEventListener.addEventListener("ready",
+Pebble.addEventListener("ready",
   function(e) {
     console.log("JS Starting...");
   }
 );
 
-PebbleEventListener.addEventListener("appmessage", function(e) {
+Pebble.addEventListener("appmessage", function(e) {
   console.log("Got message from pebble: " + JSON.stringify(e));
   if ("requestUpdate" in e.payload) {
     doUpdate();
@@ -48,8 +48,8 @@ function successfulGeoloc(position) {
         var response = JSON.parse(req.responseText);
 
         var nextPassage = {
-          risetime: response.response[0].risetime.toString(),
-          duration: response.response[0].duration.toString()
+          risetime: response.response[0].risetime,
+          duration: response.response[0].duration
         };
         console.log("Sending: " + JSON.stringify(nextPassage));
         Pebble.sendAppMessage(nextPassage);

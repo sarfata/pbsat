@@ -1,4 +1,4 @@
-#include <pebble_os.h>
+#include <pebble.h>
 
 /* Define the keys that will be used in AppMessage communication.
  * They must match what you define in appinfo.json -> appKeys.
@@ -38,7 +38,7 @@ typedef struct {
   /* Have we warned the user that this pass is imminent? */
   bool announced_pass;
   /* Difference between localtime and UTC time in seconds */
-  int time_delta;
+  int32_t time_delta;
 } ISSData;
 
 ISSUI *init_ui();
