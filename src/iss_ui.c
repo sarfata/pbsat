@@ -1,6 +1,6 @@
 #include <pebble.h>
 #include "pbsat.h"
-
+#include "iss_ui.h"
 
 /* Forward declarations of load and unload */
 void iss_load(Window *);
@@ -11,7 +11,7 @@ static WindowHandlers window_handlers = {
   .unload = &iss_unload
 };
 
-ISSUI *init_ui() {
+ISSUI *init_iss_ui() {
   ISSUI *iss_ui = malloc(sizeof(ISSUI));
   APP_LOG(APP_LOG_LEVEL_INFO, "Init UI()");
 
@@ -26,10 +26,34 @@ ISSUI *init_ui() {
   return iss_ui;
 }
 
-void deinit_ui(ISSUI *iss_ui) {
+void deinit_iss_ui(ISSUI *iss_ui) {
   window_destroy(iss_ui->window);
   free(iss_ui);
 }
+
+void update_iss_ui(ISSUI* iss_ui, time_t local, time_t countdown, char *error)
+{
+  // Localtime is always a valid info.
+  strftime(iss_ui->time_str, sizeof(iss_ui->time_str), "%H:%M", localtime(&local));
+  text_layer_set_text(iss_ui->time_layer, iss_ui->time_str);
+
+  // Only display pass info if there is no error.
+  if (!error) {
+    layer_set_hidden(text_layer_get_layer(iss_ui->error_layer), true);
+    layer_set_hidden(iss_ui->pass_layer, false);
+
+    strftime(iss_ui->pass_str, sizeof(iss_ui->pass_str), "%H:%M:%S", gmtime(&countdown));
+    text_layer_set_text(iss_ui->pass_text_layer, iss_ui->pass_str);
+  }
+  else {
+    layer_set_hidden(text_layer_get_layer(iss_ui->error_layer), false);
+    layer_set_hidden(iss_ui->pass_layer, true);
+
+    strncpy(iss_ui->error_str, error, sizeof(iss_ui->error_str));
+    text_layer_set_text(iss_ui->error_layer, iss_ui->error_str);
+  }
+}
+
 
 void iss_load(Window *window) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Loading window...");

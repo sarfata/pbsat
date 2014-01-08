@@ -1,40 +1,42 @@
 #include <pebble.h>
 
 #include "pbsat.h"
+#include "iss_ui.h"
+#include "comm.h"
 
-static ISSUI *iss_ui;
-static ISSData *iss_data;
+static struct PebbleSat {
+  ISSUI *iss_ui;
+  ISSData *iss_data;
+} pbsat;
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   time_t local, utc, diff;
 
   time(&local);
-  utc = local + iss_data->time_delta;
+  utc = local + pbsat.iss_data->time_delta;
+  diff = pbsat.iss_data->pass_start - utc;
 
-  strftime(iss_ui->time_str, sizeof(iss_ui->time_str), "%H:%M", localtime(&local));
-  text_layer_set_text(iss_ui->time_layer, iss_ui->time_str);
-
-  if (utc < iss_data->pass_start) {
-    diff = iss_data->pass_start - utc;
-    strftime(iss_ui->pass_str, sizeof(iss_ui->pass_str), "%H:%M:%S", gmtime(&diff));
+  if (pbsat.iss_data->pass_start == 0) {
+    update_iss_ui(pbsat.iss_ui, local, 0, "No pass");
   }
-  else if (utc < iss_data->pass_end) {
-    diff = iss_data->pass_end - utc;
-    strftime(iss_ui->pass_str, sizeof(iss_ui->pass_str), "^ %H:%M:%S ^", gmtime(&diff));
+  else if (utc > pbsat.iss_data->pass_end) {
+    update_iss_ui(pbsat.iss_ui, local, 0, "Pass in past");
+  }
+  else if (utc > pbsat.iss_data->pass_start) {
+    update_iss_ui(pbsat.iss_ui, local, 0, "ISS Above!!!");
   }
   else {
-    snprintf(iss_ui->pass_str, sizeof(iss_ui->pass_str), "--:--:--");
+    update_iss_ui(pbsat.iss_ui, local, diff, NULL);
   }
-  text_layer_set_text(iss_ui->pass_text_layer, iss_ui->pass_str);
 }
 
 void handle_init(void) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Sat starting!");
 
-  iss_data = malloc(sizeof(ISSData));
+  pbsat.iss_data = malloc(sizeof(ISSData));
 
-  iss_ui = init_ui();
-  init_comm(iss_data);
+  pbsat.iss_ui = init_iss_ui();
+  init_comm(pbsat.iss_data);
 
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
 }
@@ -42,8 +44,8 @@ void handle_init(void) {
 void handle_deinit(void) {
   tick_timer_service_unsubscribe();
   deinit_comm();
-  deinit_ui(iss_ui);
-  free(iss_data);
+  deinit_iss_ui(pbsat.iss_ui);
+  free(pbsat.iss_data);
 }
 
 int main(void) {
