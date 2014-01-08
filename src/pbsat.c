@@ -19,7 +19,8 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
     diff = pbsat.iss_data->pass_start - utc;
 
     if (pbsat.iss_data->pass_start == 0) {
-      update_iss_ui(pbsat.iss_ui, local, 0, "No pass");
+      // If we do not have an error - and do not have a next pass, we are basically loading...
+      update_iss_ui(pbsat.iss_ui, local, 0, NULL);
     }
     else if (utc > pbsat.iss_data->pass_end) {
       update_iss_ui(pbsat.iss_ui, local, 0, "Pass in past");

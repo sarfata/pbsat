@@ -44,7 +44,12 @@ void update_iss_ui(ISSUI* iss_ui, time_t local, time_t countdown, char *error)
     layer_set_hidden(text_layer_get_layer(iss_ui->error_layer), true);
     layer_set_hidden(iss_ui->pass_layer, false);
 
-    strftime(iss_ui->pass_str, sizeof(iss_ui->pass_str), "%H:%M:%S", gmtime(&countdown));
+    if (countdown > 0) {
+      strftime(iss_ui->pass_str, sizeof(iss_ui->pass_str), "%H:%M:%S", gmtime(&countdown));
+    }
+    else {
+      strncpy(iss_ui->pass_str, "...", sizeof(iss_ui->pass_str));
+    }
     text_layer_set_text(iss_ui->pass_text_layer, iss_ui->pass_str);
   }
   else {
