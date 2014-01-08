@@ -9,11 +9,6 @@
 #define KEY_ERROR           423
 #define KEY_REQUEST_UPDATE  424
 
-// A disgusting hack until this is in the firmware
-extern void *g_user_data;
-#define window_set_user_data(w, p) g_user_data = p
-#define window_get_user_data(w) g_user_data
-
 /* Define a structure to hold of our UI elements */
 typedef struct {
   Window *window;
