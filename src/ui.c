@@ -31,52 +31,71 @@ void deinit_ui(ISSUI *iss_ui) {
   free(iss_ui);
 }
 
-static TextLayer *configure_legend_layer(TextLayer *layer, char *initial_text) {
-  text_layer_set_background_color(layer, GColorBlack);
-  text_layer_set_text_color(layer, GColorWhite);
-  text_layer_set_font(layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text_alignment(layer, GTextAlignmentCenter);
-  text_layer_set_text(layer, initial_text);
-  return layer;
-}
-
-static TextLayer *configure_time_layer(TextLayer *layer) {
-  text_layer_set_background_color(layer, GColorWhite);
-  text_layer_set_text_color(layer, GColorBlack);
-  text_layer_set_font(layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text_alignment(layer, GTextAlignmentCenter);
-  return layer;
-}
-
-
 void iss_load(Window *window) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Loading window...");
   ISSUI *iss_ui = window_get_user_data(window);
 
-  iss_ui->time_legend = configure_legend_layer(text_layer_create(GRect(0, 10, 144, 20)), "Local Time");
-  iss_ui->time_layer = configure_time_layer(text_layer_create(GRect(0, 30, 144, 20)));
-  iss_ui->utc_legend = configure_legend_layer(text_layer_create(GRect(0, 70, 144, 20)), "UTC Time");
-  iss_ui->utc_layer =  configure_time_layer(text_layer_create(GRect(0, 90, 144, 20)));
-  iss_ui->countdown_legend = configure_legend_layer(text_layer_create(GRect(0, 130, 144, 20)), "Next ISS Pass");
-  iss_ui->countdown_layer = configure_time_layer(text_layer_create(GRect(0, 150, 144, 20)));
+  iss_ui->iss_bmp = gbitmap_create_with_resource(RESOURCE_ID_ISS_IMAGE);
+  iss_ui->pass_bmp = gbitmap_create_with_resource(RESOURCE_ID_PASS_ICON);
 
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->time_legend));
+  /* Create a layer to hold the ISS image */
+  iss_ui->background_layer = bitmap_layer_create(GRect(0, 0, 144, 91));
+  bitmap_layer_set_bitmap(iss_ui->background_layer, iss_ui->iss_bmp);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(iss_ui->background_layer));
+
+  /* Create a layer to hold the pass icon and the pass text */
+  iss_ui->pass_layer = layer_create(GRect(0, 92, 144, 20));
+
+  iss_ui->pass_icon_layer = bitmap_layer_create(GRect(0, 0, 42, 20));
+  bitmap_layer_set_bitmap(iss_ui->pass_icon_layer, iss_ui->pass_bmp);
+  bitmap_layer_set_alignment(iss_ui->pass_icon_layer, GAlignRight);
+  layer_add_child(iss_ui->pass_layer, bitmap_layer_get_layer(iss_ui->pass_icon_layer));
+
+  iss_ui->pass_text_layer = text_layer_create(GRect(50, -4, 94, 20));
+  text_layer_set_font(iss_ui->pass_text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_text_alignment(iss_ui->pass_text_layer, GTextAlignmentLeft);
+  text_layer_set_text_color(iss_ui->pass_text_layer, GColorWhite);
+  text_layer_set_background_color(iss_ui->pass_text_layer, GColorClear);
+  layer_add_child(iss_ui->pass_layer, text_layer_get_layer(iss_ui->pass_text_layer));
+
+  layer_add_child(window_get_root_layer(window), iss_ui->pass_layer);
+
+  /* Create a layer to display errors when needed */
+  iss_ui->error_layer = text_layer_create(GRect(0, 92, 144, 20));
+  text_layer_set_font(iss_ui->error_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_text_alignment(iss_ui->error_layer, GTextAlignmentCenter);
+  text_layer_set_text_color(iss_ui->error_layer, GColorWhite);
+  text_layer_set_background_color(iss_ui->error_layer, GColorClear);
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->error_layer));
+
+  /* Create a layer to display the time at the bottom of the screen */
+  iss_ui->time_layer = text_layer_create(GRect(0, 114, 144, 54));
+  text_layer_set_font(iss_ui->time_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  text_layer_set_text_alignment(iss_ui->time_layer, GTextAlignmentCenter);
+  text_layer_set_text_color(iss_ui->time_layer, GColorWhite);
+  text_layer_set_background_color(iss_ui->time_layer, GColorBlack);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->time_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->utc_legend));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->utc_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->countdown_legend));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->countdown_layer));
 
+  /* Inverse the bottom part of the screen to create contrast around the current time */
+  iss_ui->time_bg_layer = inverter_layer_create(GRect(0, 114, 144, 54));
+  layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(iss_ui->time_bg_layer));
 }
 
 void iss_unload(Window* window) {
   ISSUI *iss_ui = window_get_user_data(window);
 
-  text_layer_destroy(iss_ui->countdown_legend);
-  text_layer_destroy(iss_ui->time_legend);
-  text_layer_destroy(iss_ui->utc_legend);
+  bitmap_layer_destroy(iss_ui->background_layer);
+  bitmap_layer_destroy(iss_ui->pass_icon_layer);
+
+  gbitmap_destroy(iss_ui->iss_bmp);
+  gbitmap_destroy(iss_ui->pass_bmp);
+
+  bitmap_layer_destroy(iss_ui->pass_icon_layer);
+  text_layer_destroy(iss_ui->pass_text_layer);
+  layer_destroy(iss_ui->pass_layer);
+
+  text_layer_destroy(iss_ui->error_layer);
 
   text_layer_destroy(iss_ui->time_layer);
-  text_layer_destroy(iss_ui->utc_layer);
-  text_layer_destroy(iss_ui->countdown_layer);
+  inverter_layer_destroy(iss_ui->time_bg_layer);
 }

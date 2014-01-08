@@ -13,15 +13,23 @@
 typedef struct {
   Window *window;
   GBitmap *iss_bmp;
+  GBitmap *pass_bmp;
+
   BitmapLayer *background_layer;
-  TextLayer *time_legend, *utc_legend, *countdown_legend;
+
+  Layer *pass_layer;
+  BitmapLayer *pass_icon_layer;
+  TextLayer *pass_text_layer;
+
+  TextLayer *error_layer;
+
+  InverterLayer *time_bg_layer;
   TextLayer *time_layer;
-  TextLayer *utc_layer;
-  TextLayer *countdown_layer;
+
   /* Strings to hold the text that will be displayed in the layers */
-  char time_str[20];
-  char utc_str[20];
-  char countdown_str[20];
+  char error_str[42];
+  char pass_str[10];
+  char time_str[6];
 } ISSUI;
 
 /* Define a structure that defines the current status of the ISS */

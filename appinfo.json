@@ -26,8 +26,13 @@
        },
        {
         "type":"png",
-        "name":"BACKGROUND_IMAGE",
-        "file":"backgroundiss.png"
+        "name":"ISS_IMAGE",
+        "file":"iss.png"
+       },
+       {
+        "type":"png",
+        "name":"PASS_ICON",
+        "file":"orbit.png"
        }
     ]
   }
