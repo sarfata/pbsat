@@ -55,7 +55,8 @@ function successfulGeoloc(position) {
         Pebble.sendAppMessage(nextPassage);
       }
       else {
-        console.log("Error");
+        console.log("Error ( " + JSON.stringify(req) + ")");
+        Pebble.sendAppMessage({ 'error': 'HTTP ' + req.status });
       }
     }
   }
@@ -64,5 +65,6 @@ function successfulGeoloc(position) {
 
 function errorGeoloc(msg) {
   console.log("Geoloc failed: " + msg);
+  Pebble.sendAppMessage({ 'error': 'Geoloc failed' });
 }
 
