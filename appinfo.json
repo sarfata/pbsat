@@ -38,6 +38,11 @@
         "type":"png",
         "name":"PASS_ICON",
         "file":"orbit.png"
+       },
+       {
+        "type":"png",
+        "name":"DOWN_ICON",
+        "file":"down.png"
        }
     ]
   }

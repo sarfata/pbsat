@@ -2,10 +2,12 @@
 
 #include "pbsat.h"
 #include "iss_ui.h"
+#include "pass_ui.h"
 #include "comm.h"
 
 static struct PebbleSat {
   ISSUI *iss_ui;
+  PassUI *pass_ui;
   ISSData *iss_data;
 } pbsat;
 
@@ -34,6 +36,15 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   }
   else {
     update_iss_ui(pbsat.iss_ui, local, 0, pbsat.iss_data->error_msg);
+
+    // debugging. show pass ui as soon as error is confirmed.
+    if (pbsat.pass_ui == NULL) {
+      pbsat.pass_ui = init_pass_ui();
+      update_pass_ui(pbsat.pass_ui);
+    }
+    else {
+      update_pass_ui(pbsat.pass_ui);
+    }
   }
 }
 
@@ -51,6 +62,9 @@ void handle_init(void) {
 void handle_deinit(void) {
   tick_timer_service_unsubscribe();
   deinit_comm();
+  if (pbsat.pass_ui) {
+    deinit_pass_ui(pbsat.pass_ui);
+  }
   deinit_iss_ui(pbsat.iss_ui);
   free(pbsat.iss_data);
 }
