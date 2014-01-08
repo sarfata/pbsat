@@ -39,6 +39,8 @@ void update_iss_ui(ISSUI* iss_ui, time_t local, time_t countdown, char *error)
 
   // Only display pass info if there is no error.
   if (!error) {
+    bitmap_layer_set_bitmap(iss_ui->background_layer, iss_ui->iss_bmp);
+
     layer_set_hidden(text_layer_get_layer(iss_ui->error_layer), true);
     layer_set_hidden(iss_ui->pass_layer, false);
 
@@ -46,6 +48,8 @@ void update_iss_ui(ISSUI* iss_ui, time_t local, time_t countdown, char *error)
     text_layer_set_text(iss_ui->pass_text_layer, iss_ui->pass_str);
   }
   else {
+    bitmap_layer_set_bitmap(iss_ui->background_layer, iss_ui->error_bmp);
+
     layer_set_hidden(text_layer_get_layer(iss_ui->error_layer), false);
     layer_set_hidden(iss_ui->pass_layer, true);
 
@@ -61,10 +65,11 @@ void iss_load(Window *window) {
 
   iss_ui->iss_bmp = gbitmap_create_with_resource(RESOURCE_ID_ISS_IMAGE);
   iss_ui->pass_bmp = gbitmap_create_with_resource(RESOURCE_ID_PASS_ICON);
+  iss_ui->error_bmp = gbitmap_create_with_resource(RESOURCE_ID_ERROR_IMAGE);
 
-  /* Create a layer to hold the ISS image */
+  /* Create a layer to hold the ISS (or errro) image */
   iss_ui->background_layer = bitmap_layer_create(GRect(0, 0, 144, 91));
-  bitmap_layer_set_bitmap(iss_ui->background_layer, iss_ui->iss_bmp);
+  bitmap_layer_set_alignment(iss_ui->background_layer, GAlignTop);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(iss_ui->background_layer));
 
   /* Create a layer to hold the pass icon and the pass text */
@@ -85,7 +90,7 @@ void iss_load(Window *window) {
   layer_add_child(window_get_root_layer(window), iss_ui->pass_layer);
 
   /* Create a layer to display errors when needed */
-  iss_ui->error_layer = text_layer_create(GRect(0, 92, 144, 20));
+  iss_ui->error_layer = text_layer_create(GRect(0, 50, 144, 62));
   text_layer_set_font(iss_ui->error_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(iss_ui->error_layer, GTextAlignmentCenter);
   text_layer_set_text_color(iss_ui->error_layer, GColorWhite);
@@ -111,6 +116,7 @@ void iss_unload(Window* window) {
   bitmap_layer_destroy(iss_ui->background_layer);
   bitmap_layer_destroy(iss_ui->pass_icon_layer);
 
+  gbitmap_destroy(iss_ui->error_bmp);
   gbitmap_destroy(iss_ui->iss_bmp);
   gbitmap_destroy(iss_ui->pass_bmp);
 

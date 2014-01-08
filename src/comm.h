@@ -11,3 +11,5 @@
 
 void init_comm(ISSData *);
 void deinit_comm();
+
+void request_update();

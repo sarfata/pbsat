@@ -30,6 +30,11 @@
         "file":"iss.png"
        },
        {
+         "type":"png",
+         "name":"ERROR_IMAGE",
+         "file":"warning.png"
+       },
+       {
         "type":"png",
         "name":"PASS_ICON",
         "file":"orbit.png"

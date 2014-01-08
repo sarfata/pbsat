@@ -1,5 +1,7 @@
 #include <pebble.h>
 
+#define MAX_ERROR_LEN 100
+
 /* Define a structure that defines the current status of the ISS */
 typedef struct {
   /* Time (UTC) when the next pass will start */
@@ -13,5 +15,6 @@ typedef struct {
   /* Got time delta from phone? */
   bool got_time_delta;
   /* Got error? */
-  char *error_msg;
+  bool got_error;
+  char error_msg[MAX_ERROR_LEN];
 } ISSData;

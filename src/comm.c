@@ -2,6 +2,15 @@
 #include "pbsat.h"
 #include "comm.h"
 
+static void clear_error(ISSData* iss_data) {
+  iss_data->got_error = false;
+}
+
+static void set_error(ISSData* iss_data, char *error) {
+  strncpy(iss_data->error_msg, error, sizeof(iss_data->error_msg));
+  iss_data->got_error = true;
+}
+
 static void appmsg_in_received(DictionaryIterator *received, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "In received.");
 
@@ -19,11 +28,13 @@ static void appmsg_in_received(DictionaryIterator *received, void *context) {
       iss_data->pass_start = risetime;
       iss_data->announced_pass = false;
     }
+    clear_error(iss_data);
   }
   if (duration_tuple) {
     int32_t duration = duration_tuple->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Got duration: %li", duration);
     iss_data->pass_end = iss_data->pass_start + duration;
+    clear_error(iss_data);
   }
   if (timezone_offset_tuple) {
     int32_t timezone_offset = timezone_offset_tuple->value->int32;
@@ -33,11 +44,14 @@ static void appmsg_in_received(DictionaryIterator *received, void *context) {
   }
   if (error_tuple) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Got error: %s", error_tuple->value->cstring);
+    set_error(iss_data, error_tuple->value->cstring);
   }
 }
 
 static void appmsg_in_dropped(AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "In dropped: %i", reason);
+  // Request a new update...
+  request_update();
 }
 
 static void appmsg_out_sent(DictionaryIterator *sent, void *context) {
@@ -45,7 +59,25 @@ static void appmsg_out_sent(DictionaryIterator *sent, void *context) {
 }
 
 static void appmsg_out_failed(DictionaryIterator *failed, AppMessageResult reason, void *context) {
+  ISSData *iss_data = (ISSData *) context;
+
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Out failed: %i", reason);
+
+  switch (reason) {
+    case APP_MSG_SEND_REJECTED:
+    case APP_MSG_SEND_TIMEOUT:
+      set_error(iss_data, "Phone not responding. Please reinstall.");
+      request_update();
+      break;
+    case APP_MSG_NOT_CONNECTED:
+      set_error(iss_data, "Phone not connected");
+      request_update();
+      break;
+    default:
+      // For all other errors. Just retry.
+      request_update();
+      break;
+  }
 }
 
 // Ask the JS code to send a new update
@@ -59,6 +91,8 @@ void request_update() {
 }
 
 void init_comm(ISSData *iss_data) {
+  clear_error(iss_data);
+
   app_message_register_inbox_received(appmsg_in_received);
   app_message_register_inbox_dropped(appmsg_in_dropped);
   app_message_register_outbox_sent(appmsg_out_sent);

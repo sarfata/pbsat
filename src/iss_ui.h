@@ -5,6 +5,7 @@ typedef struct {
   Window *window;
   GBitmap *iss_bmp;
   GBitmap *pass_bmp;
+  GBitmap *error_bmp;
 
   BitmapLayer *background_layer;
 
