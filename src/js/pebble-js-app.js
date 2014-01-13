@@ -2,7 +2,9 @@
 Pebble.sendAppMessageWithRetry = function(message, retryCount, successCb, failedCb) {
   var retry = 0;
   var success = function(e) {
-    successCb(e);
+    if (typeof successCb == "function") {
+      successCb(e);
+    }
   };
   var failed = function(e) {
     console.log("Failed sending message: " + JSON.stringify(message) +
@@ -12,7 +14,9 @@ Pebble.sendAppMessageWithRetry = function(message, retryCount, successCb, failed
       Pebble.sendAppMessage(message, success, failed);
     }
     else {
-      failedCb(e);
+      if (typeof failedCb == "function") {
+        failedCb(e);
+      }
     }
   };
   Pebble.sendAppMessage(message, success, failed);
@@ -65,7 +69,7 @@ function successfulGeoloc(position) {
 }
 
 function errorGeoloc(msg) {
-  console.log("Geoloc failed: " + msg);
+  console.log("Geoloc failed: " + JSON.stringify(msg));
   Pebble.sendAppMessageWithRetry({ 'error': 'Geoloc failed' }, 3);
 }
 
@@ -94,7 +98,7 @@ function requestSatelliteTracking(satellite, position) {
 }
 
 function sendTrackingInformation(response) {
-  response = testdata();
+  // uncomment for demo mode - response = testdata();
 
   var nextPassage = {
     risetime: response.pass[0].rise.time,
@@ -150,18 +154,18 @@ function testdata() {
         "positions": [
           {
               "time": riseTime,
-              "azimuth": 271.77353392729623,
+              "azimuth": 260.77353392729623,
               "altitude": 0.04218089043131164
           },
           {
               "time": riseTime + 60,
-              "azimuth": 253.30214592237778,
-              "altitude": 22.3545149769612546
+              "azimuth": 242.30214592237778,
+              "altitude": 30.3545149769612546
           },
           {
               "time": riseTime + 120,
               "azimuth": 220.51563797752684,
-              "altitude": 45.629634127462989
+              "altitude": 41.629634127462989
           },
           {
               "time": riseTime + 180,
@@ -171,7 +175,7 @@ function testdata() {
           {
               "time": riseTime + 240,
               "azimuth": 160.52337807941521,
-              "altitude": 53.984602244786991
+              "altitude": 50.984602244786991
           },
           {
               "time": riseTime + 300,
@@ -181,11 +185,11 @@ function testdata() {
           {
               "time": riseTime + 360,
               "azimuth": 110.80591035199153,
-              "altitude": 20.533912014453022
+              "altitude": 30.533912014453022
           },
           {
               "time": riseTime + 420,
-              "azimuth": 86.24688868763702,
+              "azimuth": 92.24688868763702,
               "altitude": 2.2556881160866937
           }
         ]
