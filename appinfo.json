@@ -1,8 +1,8 @@
 {
   "uuid": "226834ae-786e-4302-a52f-6e7efc9f990b",
-  "shortName": "Pebble ISS Tracker",
-  "longName": "Pebble ISS Tracker",
-  "companyName": "Pebble Technology",
+  "shortName": "Pebble Sat",
+  "longName": "Pebble Sat",
+  "companyName": "sarfata.org",
   "capabilities": [ "location" ],
   "versionCode": 1,
   "versionLabel": "1.0.2",

@@ -22,10 +22,10 @@ Pebble.sendAppMessageWithRetry = function(message, retryCount, successCb, failed
   Pebble.sendAppMessage(message, success, failed);
 };
 
-/* Don't do anything on initialization. We wait for a request from Pebble */
 Pebble.addEventListener("ready",
   function(e) {
     console.log("JS Starting...");
+    doUpdate();
   }
 );
 
@@ -43,12 +43,7 @@ function doUpdate() {
   /* If geolocation is available, use it! */
   if (navigator.geolocation) {
     console.log("Geolocating ...");
-    var options = {
-      enableHighAccuracy: true,
-      timeout: 5000,
-      maximumAge: 0
-    };
-    navigator.geolocation.getCurrentPosition(successfulGeoloc, errorGeoloc, options);
+    navigator.geolocation.getCurrentPosition(successfulGeoloc, errorGeoloc);
   }
   else {
     Pebble.sendAppMessageWithRetry({ 'error': 'No GPS' }, 3);
