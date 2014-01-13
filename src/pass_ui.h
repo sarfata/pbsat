@@ -7,6 +7,9 @@ typedef struct {
   TextLayer *az_layer;
   TextLayer *el_layer;
   TextLayer *countdown_layer;
+  char az_text[10];
+  char el_text[10];
+  char countdown_text[10];
 
   GBitmap *down_icon;
   BitmapLayer *down_icon_layer;
@@ -16,6 +19,6 @@ typedef struct {
 
 /* And some functions to manipulate it */
 PassUI *init_pass_ui();
-void deinit_pass_ui(PassUI*);
+void destroy_pass_ui(PassUI*);
 
-void update_pass_ui(PassUI* pass_ui);
+void update_pass_ui(PassUI* pass_ui, ISSData *iss_data);

@@ -11,7 +11,7 @@
   },
   "appKeys": {
     "risetime": 420,
-    "duration": 421,
+    "settime":  421,
     "timezoneOffset": 422,
     "error": 423,
     "requestUpdate": 424
