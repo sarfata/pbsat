@@ -24,7 +24,7 @@ Pebble.sendAppMessageWithRetry = function(message, retryCount, successCb, failed
 
 Pebble.addEventListener("ready",
   function(e) {
-    console.log("JS Starting...");
+    console.log("JS Starting... v1.0.4");
     doUpdate();
   }
 );
@@ -59,7 +59,6 @@ function sendTimezoneToWatch() {
 
 function successfulGeoloc(position) {
   console.log("Geoloc success: " + JSON.stringify(position));
-
   requestSatelliteTracking('ISS', position);
 }
 

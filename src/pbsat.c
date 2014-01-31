@@ -50,7 +50,7 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 void handle_init(void) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Sat starting!");
+  APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Sat starting! v1.0.4");
 
   pbsat.iss_data = malloc(sizeof(ISSData));
 
