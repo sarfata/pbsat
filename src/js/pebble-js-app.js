@@ -24,7 +24,7 @@ Pebble.sendAppMessageWithRetry = function(message, retryCount, successCb, failed
 
 Pebble.addEventListener("ready",
   function(e) {
-    console.log("JS Starting... v1.0.4");
+    console.log("JS Starting... v1.0.5");
     doUpdate();
   }
 );
