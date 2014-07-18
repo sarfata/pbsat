@@ -125,12 +125,10 @@ void iss_unload(Window* window) {
   gbitmap_destroy(iss_ui->iss_bmp);
   gbitmap_destroy(iss_ui->pass_bmp);
 
-  bitmap_layer_destroy(iss_ui->pass_icon_layer);
   text_layer_destroy(iss_ui->pass_text_layer);
   layer_destroy(iss_ui->pass_layer);
 
   text_layer_destroy(iss_ui->error_layer);
-
   text_layer_destroy(iss_ui->time_layer);
   inverter_layer_destroy(iss_ui->time_bg_layer);
 }
