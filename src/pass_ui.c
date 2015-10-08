@@ -28,7 +28,9 @@ PassUI *init_pass_ui() {
   APP_LOG(APP_LOG_LEVEL_INFO, "Init PassUI");
 
   pass_ui->window = window_create();
+#ifdef PBL_SDK_2
   window_set_fullscreen(pass_ui->window, true);
+#endif
   window_set_background_color(pass_ui->window, GColorBlack);
   window_set_window_handlers(pass_ui->window, window_handlers);
   window_set_user_data(pass_ui->window, pass_ui);

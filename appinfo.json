@@ -3,15 +3,23 @@
   "shortName": "Pebble Sat",
   "longName": "Pebble Sat",
   "companyName": "sarfata.org",
-  "capabilities": [ "location" ],
+  "targetPlatforms": [
+    "aplite",
+    "basalt",
+    "chalk"
+  ],
+  "sdkVersion": "3",
+  "capabilities": [
+    "location"
+  ],
   "versionCode": 1,
-  "versionLabel": "1.0.6",
+  "versionLabel": "2.0",
   "watchapp": {
     "watchface": true
   },
   "appKeys": {
     "risetime": 420,
-    "settime":  421,
+    "settime": 421,
     "timezoneOffset": 422,
     "error": 423,
     "requestUpdate": 424
@@ -20,30 +28,30 @@
     "media": [
       {
         "menuIcon": true,
-        "type":"png",
-        "name":"IMAGE_MENU_ICON",
-        "file":"menu_icon_iss.png"
-       },
-       {
-        "type":"png",
-        "name":"ISS_IMAGE",
-        "file":"iss.png"
-       },
-       {
-         "type":"png",
-         "name":"ERROR_IMAGE",
-         "file":"warning.png"
-       },
-       {
-        "type":"png",
-        "name":"PASS_ICON",
-        "file":"orbit.png"
-       },
-       {
-        "type":"png",
-        "name":"DOWN_ICON",
-        "file":"down.png"
-       }
+        "type": "png",
+        "name": "IMAGE_MENU_ICON",
+        "file": "menu_icon_iss.png"
+      },
+      {
+        "type": "png",
+        "name": "ISS_IMAGE",
+        "file": "iss.png"
+      },
+      {
+        "type": "png",
+        "name": "ERROR_IMAGE",
+        "file": "warning.png"
+      },
+      {
+        "type": "png",
+        "name": "PASS_ICON",
+        "file": "orbit.png"
+      },
+      {
+        "type": "png",
+        "name": "DOWN_ICON",
+        "file": "down.png"
+      }
     ]
   }
 }

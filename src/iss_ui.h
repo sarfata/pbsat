@@ -15,7 +15,9 @@ typedef struct {
 
   TextLayer *error_layer;
 
+#ifdef PBL_SDK_2
   InverterLayer *time_bg_layer;
+#endif
   TextLayer *time_layer;
 
   /* Strings to hold the text that will be displayed in the layers */

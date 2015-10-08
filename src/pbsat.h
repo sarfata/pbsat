@@ -16,8 +16,6 @@ typedef struct {
   int32_t time_delta;
   /* Linked list of position of the object in the sky */
   struct SkyPosition *position_list;
-  /* Got time delta from phone? */
-  bool got_time_delta;
   /* Got error? */
   bool got_error;
   char error_msg[MAX_ERROR_LEN];

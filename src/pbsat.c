@@ -49,10 +49,27 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   }
 }
 
-void handle_init(void) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Sat starting! v1.0.6");
+ISSData *issdata_init() {
+  ISSData *iss_data = malloc(sizeof(ISSData));
+  memset(iss_data, 0, sizeof(ISSData));
+  return iss_data;
+}
 
-  pbsat.iss_data = malloc(sizeof(ISSData));
+void issdata_destroy(ISSData *iss_data) {
+  struct SkyPosition* pos = iss_data->position_list;
+
+  while (pos != NULL) {
+    SkyPosition *p = pos;
+    pos = pos->next;
+    free(p);
+  }
+  free(pbsat.iss_data);
+}
+
+void handle_init(void) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Pebble Sat starting! vXXXXX");
+
+  pbsat.iss_data = issdata_init();
 
   pbsat.iss_ui = init_iss_ui();
   init_comm(pbsat.iss_data);
@@ -70,7 +87,7 @@ void handle_deinit(void) {
   }
   deinit_iss_ui(pbsat.iss_ui);
   sp_list_free(pbsat.iss_data->position_list);
-  free(pbsat.iss_data);
+  issdata_destroy(pbsat.iss_data);
 }
 
 int main(void) {

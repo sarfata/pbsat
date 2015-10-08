@@ -16,7 +16,9 @@ ISSUI *init_iss_ui() {
   APP_LOG(APP_LOG_LEVEL_INFO, "Init UI()");
 
   iss_ui->window = window_create();
+#ifdef PBL_SDK_2
   window_set_fullscreen(iss_ui->window, true);
+#endif
   window_set_background_color(iss_ui->window, GColorBlack);
   window_set_window_handlers(iss_ui->window, window_handlers);
   window_set_user_data(iss_ui->window, iss_ui);
@@ -110,9 +112,11 @@ void iss_load(Window *window) {
   text_layer_set_background_color(iss_ui->time_layer, GColorBlack);
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(iss_ui->time_layer));
 
+#ifdef PBL_SDK_2
   /* Inverse the bottom part of the screen to create contrast around the current time */
   iss_ui->time_bg_layer = inverter_layer_create(GRect(0, 114, 144, 54));
   layer_add_child(window_get_root_layer(window), inverter_layer_get_layer(iss_ui->time_bg_layer));
+#endif
 }
 
 void iss_unload(Window* window) {
@@ -130,5 +134,7 @@ void iss_unload(Window* window) {
 
   text_layer_destroy(iss_ui->error_layer);
   text_layer_destroy(iss_ui->time_layer);
+#ifdef PBL_SDK_2
   inverter_layer_destroy(iss_ui->time_bg_layer);
+#endif
 }

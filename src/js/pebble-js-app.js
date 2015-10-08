@@ -53,8 +53,19 @@ function doUpdate() {
 function sendTimezoneToWatch() {
   // Get the number of seconds to add to convert localtime to utc
   var offsetMinutes = new Date().getTimezoneOffset() * 60;
+
+  // This will only be needed for Pebble v2 watches. v3 already knows its timezone
+  if (Pebble.getActiveWatchInfo) {
+    var watch = Pebble.getActiveWatchInfo();
+    if (watch.firmware.major > 2) {
+      offsetMinutes = 0;
+    }
+  }
+
   // Send it to the watch
-  Pebble.sendAppMessageWithRetry({ timezoneOffset: offsetMinutes }, 3);
+  if (offsetMinutes != 0) {
+    Pebble.sendAppMessageWithRetry({ timezoneOffset: offsetMinutes }, 3);
+  }
 }
 
 function successfulGeoloc(position) {
@@ -92,7 +103,8 @@ function requestSatelliteTracking(satellite, position) {
 }
 
 function sendTrackingInformation(response) {
-  // uncomment for demo mode - response = testdata();
+  // uncomment for demo mode
+  //response = testdata();
 
   var nextPassage = {
     risetime: response.pass[0].rise.time,

@@ -61,7 +61,6 @@ static void appmsg_in_received(DictionaryIterator *received, void *context) {
     int32_t timezone_offset = timezone_offset_tuple->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Got timezone offset: %li", timezone_offset);
     iss_data->time_delta = timezone_offset;
-    iss_data->got_time_delta = true;
   }
   else if (error_tuple) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Got error: %s", error_tuple->value->cstring);
