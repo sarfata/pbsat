@@ -48,13 +48,11 @@ static void appmsg_in_received(DictionaryIterator *received, void *context) {
     int32_t risetime = risetime_tuple->value->int32;
     int32_t settime = settime_tuple->value->int32;
     APP_LOG(APP_LOG_LEVEL_INFO, "Got new pass - Rise: %li Set: %li", risetime, settime);
-    if (risetime != iss_data->pass_start) {
-      iss_data->pass_start = risetime;
-      iss_data->pass_end = settime;
-      iss_data->announced_pass = false;
-      sp_list_free(iss_data->position_list);
-      iss_data->position_list = NULL;
-    }
+    iss_data->pass_start = risetime;
+    iss_data->pass_end = settime;
+    iss_data->announced_pass = false;
+    sp_list_free(iss_data->position_list);
+    iss_data->position_list = NULL;
     clear_error(iss_data);
   }
   else if (timezone_offset_tuple) {

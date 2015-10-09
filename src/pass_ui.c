@@ -51,19 +51,6 @@ void update_pass_ui(PassUI* pass_ui, ISSData *iss_data)
   skymap_data->position_list = iss_data->position_list;
   skymap_interpolate_current_position(iss_data, skymap_data);
 
-  snprintf(pass_ui->az_text, sizeof(pass_ui->az_text), "AZ: %iº", skymap_data->azimuth);
-  snprintf(pass_ui->el_text, sizeof(pass_ui->el_text), "EL: %iº", skymap_data->elevation);
-
-  time_t local, utc, countdown;
-  time(&local);
-  utc = local + iss_data->time_delta;
-  countdown = iss_data->pass_end - utc;
-  strftime(pass_ui->countdown_text, sizeof(pass_ui->countdown_text), "%H:%M:%S", gmtime(&countdown));
-
-  text_layer_set_text(pass_ui->az_layer, pass_ui->az_text);
-  text_layer_set_text(pass_ui->el_layer, pass_ui->el_text);
-  text_layer_set_text(pass_ui->countdown_layer, pass_ui->countdown_text);
-
   layer_mark_dirty(pass_ui->skymap_layer);
 }
 
@@ -71,34 +58,15 @@ void pass_load(Window *window) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Loading PassUI window...");
   PassUI *pass_ui = window_get_user_data(window);
 
-  pass_ui->az_layer = text_layer_create(GRect(0, 0, 72, 18));
-  text_layer_set_font(pass_ui->az_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text_alignment(pass_ui->az_layer, GTextAlignmentLeft);
-  text_layer_set_text_color(pass_ui->az_layer, GColorWhite);
-  text_layer_set_background_color(pass_ui->az_layer, GColorClear);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(pass_ui->az_layer));
-
-  pass_ui->el_layer = text_layer_create(GRect(72, 0, 72, 18));
-  text_layer_set_font(pass_ui->el_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text_alignment(pass_ui->el_layer, GTextAlignmentRight);
-  text_layer_set_text_color(pass_ui->el_layer, GColorWhite);
-  text_layer_set_background_color(pass_ui->el_layer, GColorClear);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(pass_ui->el_layer));
-
-  pass_ui->countdown_layer = text_layer_create(GRect(20, 148, 104, 20));
-  text_layer_set_font(pass_ui->countdown_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text_alignment(pass_ui->countdown_layer, GTextAlignmentCenter);
-  text_layer_set_text_color(pass_ui->countdown_layer, GColorWhite);
-  text_layer_set_background_color(pass_ui->countdown_layer, GColorClear);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(pass_ui->countdown_layer));
-
-  pass_ui->down_icon = gbitmap_create_with_resource(RESOURCE_ID_DOWN_ICON);
-  pass_ui->down_icon_layer = bitmap_layer_create(GRect(10, 152, 15, 15));
-  bitmap_layer_set_bitmap(pass_ui->down_icon_layer, pass_ui->down_icon);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(pass_ui->down_icon_layer));
-
-  pass_ui->skymap_layer = layer_create_with_data(GRect(0, 15, 144, 144), sizeof(SkymapData));
+#ifdef PBL_SDK_3
+  GRect bounds = layer_get_bounds(window_get_root_layer(window));
+  GRect skymap_rect = grect_inset(bounds, GEdgeInsets(18, 0, 15));
+#else
+  GRect skymap_rect = GRect(0, 15, 144, 144);
+#endif
+  pass_ui->skymap_layer = layer_create_with_data(skymap_rect, sizeof(SkymapData));
   layer_set_update_proc(pass_ui->skymap_layer, skymap_draw);
+  layer_set_clips(pass_ui->skymap_layer, false);
   layer_add_child(window_get_root_layer(window), pass_ui->skymap_layer);
 
   // Schedule vibe to let the user know it's time to look at his Pebble! and at the sky!
@@ -120,13 +88,6 @@ void pass_load(Window *window) {
 
 void pass_unload(Window* window) {
   PassUI *pass_ui = window_get_user_data(window);
-
-  text_layer_destroy(pass_ui->az_layer);
-  text_layer_destroy(pass_ui->el_layer);
-  text_layer_destroy(pass_ui->countdown_layer);
-
-  bitmap_layer_destroy(pass_ui->down_icon_layer);
-  gbitmap_destroy(pass_ui->down_icon);
 
   layer_destroy(pass_ui->skymap_layer);
 }
@@ -197,6 +158,43 @@ static void skymap_interpolate_current_position(ISSData *iss_data, SkymapData *s
   skymap_data->elevation = el;
 }
 
+#ifdef PBL_SDK_3
+
+void skymap_draw_cadran(Layer *l, GContext *ctx) {
+  GRect bounds = layer_get_bounds(l);
+
+  // Draw a large circle for horizon
+  graphics_context_set_stroke_color(ctx, GColorCobaltBlue);
+  graphics_context_set_stroke_width(ctx, 5);
+  graphics_draw_arc(ctx, bounds, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(359));
+
+  // Draw a lighter circle for 30º level
+  graphics_context_set_stroke_width(ctx, 2);
+  int inset1 = bounds.size.w / 2 / 3;
+  GRect rect1 = grect_inset(bounds, GEdgeInsets(inset1));
+  graphics_draw_arc(ctx, rect1, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(359));
+
+  // Draw a lighter circle for 60º level
+  graphics_context_set_stroke_width(ctx, 1);
+  int inset2 = inset1 * 2;
+  GRect rect2 = grect_inset(bounds, GEdgeInsets(inset2));
+  graphics_draw_arc(ctx, rect2, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(0), DEG_TO_TRIGANGLE(359));
+
+  // Draw lines of degrading width
+  for (int angle = 0; angle  <= 360; angle += 90) {
+    GPoint a = gpoint_from_polar(bounds, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
+    GPoint b = gpoint_from_polar(rect1, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
+    graphics_context_set_stroke_width(ctx, 5);
+    graphics_draw_line(ctx, a, b);
+
+    GPoint c = gpoint_from_polar(rect2, GOvalScaleModeFitCircle, DEG_TO_TRIGANGLE(angle));
+    graphics_context_set_stroke_width(ctx, 2);
+    graphics_draw_line(ctx, b, c);
+  }
+}
+
+#else
+
 void skymap_draw_cadran(Layer *l, GContext *ctx) {
   GRect bounds = layer_get_bounds(l);
   GPoint center;
@@ -221,8 +219,14 @@ void skymap_draw_cadran(Layer *l, GContext *ctx) {
     GPoint(center.x + (radius*2) + 4, center.y));
 }
 
+#endif
+
+
 void skymap_draw_trajectory(Layer *l, GContext *ctx, SkyPosition *pos) {
-  graphics_context_set_stroke_color(ctx, GColorWhite);
+#ifdef PBL_SDK_3
+  graphics_context_set_stroke_width(ctx, 2);
+#endif
+  graphics_context_set_stroke_color(ctx, PBL_IF_COLOR_ELSE(GColorIcterine, GColorBlack));
 
   // We need at least two segments
   if (pos == NULL || pos->next == NULL)
@@ -242,7 +246,7 @@ void skymap_draw_position(Layer *l, GContext *ctx, int az, int el) {
 
   GPoint p = convert_azel_to_pixels(l, az, el);
 
-  graphics_draw_circle(ctx, p, 3);
+  graphics_fill_circle(ctx, p, 3);
 }
 
 void skymap_draw(Layer *l, GContext *ctx) {

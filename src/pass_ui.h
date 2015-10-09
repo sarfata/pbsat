@@ -4,16 +4,6 @@
 typedef struct {
   Window *window;
 
-  TextLayer *az_layer;
-  TextLayer *el_layer;
-  TextLayer *countdown_layer;
-  char az_text[10];
-  char el_text[10];
-  char countdown_text[10];
-
-  GBitmap *down_icon;
-  BitmapLayer *down_icon_layer;
-
   Layer *skymap_layer;
 } PassUI;
 

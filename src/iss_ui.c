@@ -19,7 +19,7 @@ ISSUI *init_iss_ui() {
 #ifdef PBL_SDK_2
   window_set_fullscreen(iss_ui->window, true);
 #endif
-  window_set_background_color(iss_ui->window, GColorBlack);
+  window_set_background_color(iss_ui->window, PBL_IF_COLOR_ELSE(GColorBlueMoon, GColorBlack));
   window_set_window_handlers(iss_ui->window, window_handlers);
   window_set_user_data(iss_ui->window, iss_ui);
 
