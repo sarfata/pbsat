@@ -1,11 +1,18 @@
 #include <pebble.h>
+#include "map_layer.h"
 
 /* Define a structure to hold of our UI elements */
 typedef struct {
   Window *window;
+
+#ifdef PBL_SDK_3
+  GBitmap *world_bmp;
+  MapLayer *world_map;
+#else
   GBitmap *iss_bmp;
   GBitmap *pass_bmp;
   GBitmap *error_bmp;
+#endif
 
   BitmapLayer *background_layer;
 

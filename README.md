@@ -14,6 +14,11 @@ A Pebble Sat to display the next pass of the ISS over your location.
 
 This app fetches the next pass information from a Python app that regularly fetches updated [TLEs](http://en.wikipedia.org/wiki/Two-line_element_set) and calculates the next pass with the [pyephem](http://rhodesmill.org/pyephem/) library. See the [pbsat server](https://github.com/sarfata/pbsat-server) project for more info.
 
+## Attribution
+
+[Map of
+World - Single Color](http://www.freevectormaps.com/world-maps/WRLD-EPS-01-0005?ref=atr) by [FreeVectorMaps.com](http://www.freevectormaps.com/?ref=atr).
+
 ## License
 
 MIT License

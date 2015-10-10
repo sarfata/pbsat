@@ -51,6 +51,12 @@
         "type": "png",
         "name": "DOWN_ICON",
         "file": "down.png"
+      },
+      {
+        "type": "png",
+        "name": "WORLD_MAP",
+        "file": "worldmap.png",
+        "targetPlatforms": [ "basalt", "chalk" ]
       }
     ]
   }
