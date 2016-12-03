@@ -1,0 +1,60 @@
+# SpaceWatch (aka Pebble Sat v2)
+
+## Specs
+
+Key features:
+ - Track any orbital object on your Pebble watch: planets, natural satellites, artificial satellites
+ - Select what object you want to track in the app
+ - Select what object you want to see in your timeline. For those, get pins and alerts when they are about to rise.
+
+User interface:
+ - A card ui to show each object that is being tracked. For each of them,
+   SpaceWatch gives azimuth and elevation, time to rise and duration of next
+   pass.
+ - An action menu with details for upcoming pass ("12 min pass in 37 minutes",
+   "1h34 min pass in 34 hours", etc). For each pass, the app shows where the
+   object will appear and it's course on a celestial(?) map.
+ - The option to timeline subscribe to an object
+
+MVP:
+ - Keep the app as is for pebble 2.x users. The watchface makes more sense until
+   they have access to the timeline.
+ - Pre-set a list of interesting objects for all users: Moon, Sun, Mars, ISS
+ - Show the card UI with the different objects
+ - Automatically subscribe everyone to timeline pins and send them to users
+
+## Architecture
+
+ - Timeline integration means a bigger backend with more work to do. We will
+   have to store for each user their last known location and use this
+   information to calculate pass time for them.
+ - I want to write some code in Go so I am going to keep the actual TLE parsing
+   and space maths in python. I will query this from a Go daemon that will
+   manage users, timeline, pins, etc.
+ - I also want to have some deployment fun so I will use a Docker container to
+   deploy the python script and the daemon on the same machine
+ - Will use mongodb as the database. Maybe a free db somewhere - or also a part
+   of the mongo container (problem: how to backup/reload when restarting the
+   container)
+
+# Todo
+
+I think the most interesting thing to me at the moment is getting the timeline
+experience working. I know the UX will take some time to do right but I want to
+explore the timeline more than I need to explore the UX.
+
+ - Add code when the JS starts to detect if timeline is supported (3.0). If
+   timeline is available, contact server and transmit the current location of
+   the user as well as what objects we are interested in (hardcoded for now).
+ - Write server code that will listen for these http requests and save this user
+   in a database.
+ - Automatically every X minutes, compute next passes times for each user/object
+   pair in the next few days. Save the pass in the database too.
+ - Prepare the JSON for an object pin. Include an action to open the app and a
+   unique passIdx for this user.
+ - Push a pin with a unique pass id every time we calculate a new pass
+ - Find a way (ideally via Docker) to deploy that somewhere and start testing it
+ - When a pass is invalidated (user has moved - subscription changed), we should
+   remove the pin before removing the pass from our db.
+ - Update the app to download the information for the current pass and show them
+   in orbital view mode when the app is started from the timeline.

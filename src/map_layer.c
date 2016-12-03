@@ -12,6 +12,7 @@ MapLayer *map_layer_create(GRect bounds, uint32_t resource_id) {
     return NULL;
   }
 
+
   map_layer->layer = layer_create_with_data(bounds, sizeof(MapLayer*));
   MapLayer **ptr = layer_get_data(map_layer->layer);
   *ptr = map_layer;

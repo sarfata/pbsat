@@ -4,6 +4,7 @@
 #include "iss_ui.h"
 #include "pass_ui.h"
 #include "comm.h"
+#include "astro.h"
 
 static struct PebbleSat {
   ISSUI *iss_ui;
@@ -91,6 +92,8 @@ void handle_deinit(void) {
 }
 
 int main(void) {
+  test_astro();
+
   handle_init();
   app_event_loop();
   handle_deinit();
